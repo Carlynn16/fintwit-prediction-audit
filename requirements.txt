@@ -1,0 +1,12 @@
+pandas
+numpy
+openai
+yfinance
+scipy
+statsmodels
+scikit-learn
+matplotlib
+plotly
+pytest
+python-docx
+python-dotenv
