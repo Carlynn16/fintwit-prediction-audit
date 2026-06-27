@@ -1,6 +1,7 @@
 # Report (keep only exported PDF)
 *.docx
 report/
+PROJECT_BRIEF.md
 
 # Sensitive data
 data/account_mapping.csv
