@@ -116,14 +116,42 @@ class TestBuiltReport:
                 )
 
     def test_report_headings_use_times_new_roman(self):
+        # When python-docx saves a run whose paragraph uses the Normal style (which
+        # already specifies Times New Roman), it omits the redundant w:ascii/w:hAnsi
+        # and keeps only w:cs.  We therefore verify the font via the w:cs XML attribute
+        # and confirm size (H1 vs H2), bold, and colour also round-trip correctly.
         if not REPORT_PATH.exists():
             pytest.skip("report/report.docx not yet built")
         doc = Document(str(REPORT_PATH))
+        checks = {
+            "1. Introduction":      H1_SIZE,
+            "1.1 Research Questions": H2_SIZE,
+        }
+        found = set()
         for para in doc.paragraphs:
-            if para.text.strip() in ("1. Introduction", "2. Data"):
-                run = _first_run(para)
-                assert run is not None
-                assert run.font.name == FONT_NAME
+            txt = para.text.strip()
+            if txt not in checks:
+                continue
+            expected_size = checks[txt]
+            run = _first_run(para)
+            assert run is not None, f"No runs in heading '{txt}'"
+            rPr = run._r.find(qn("w:rPr"))
+            assert rPr is not None, f"No rPr for '{txt}'"
+            rFonts = rPr.find(qn("w:rFonts"))
+            assert rFonts is not None, f"No w:rFonts for '{txt}'"
+            cs_font = rFonts.get(qn("w:cs"))
+            assert cs_font == FONT_NAME, (
+                f"'{txt}': expected w:cs={FONT_NAME!r}, got {cs_font!r}"
+            )
+            assert run.font.size == expected_size, (
+                f"'{txt}': expected size {expected_size}, got {run.font.size}"
+            )
+            assert run.font.bold is True, f"'{txt}' run is not bold"
+            assert run.font.color.rgb == HEADING_COLOR, (
+                f"'{txt}': wrong colour {run.font.color.rgb}"
+            )
+            found.add(txt)
+        assert found == set(checks), f"Missing headings in report: {set(checks) - found}"
 
 
 # ---------------------------------------------------------------------------
