@@ -59,7 +59,7 @@ src/
   stats_rq3.py              # RQ3: calibration, logistic regression, gradient boosting
   stats_regime.py           # §9: regime split and persistence test
   report.py                 # python-docx document helpers (Times New Roman, headings)
-tests/                      # 9 test modules, 282 passing tests
+tests/                      # 9 test modules, 283 passing tests
 requirements.txt
 ```
 
